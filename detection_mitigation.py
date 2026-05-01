@@ -1,5 +1,6 @@
 import sqlite3
-import subprocess
+
+BLOCKLIST_FILE = "/home/chris/cloud-project/app/blocked_ips.txt"
 
 conn = sqlite3.connect("traffic.db")
 cur = conn.cursor()
@@ -53,9 +54,21 @@ else:
     print("No suspicious activity detected.")
 
 if suspicious_ips:
-    print("\nMitigation actions:")
+    print("\\nMitigation actions:")
+    existing = set()
+    try:
+        with open(BLOCKLIST_FILE, "r") as f:
+            existing = {line.strip() for line in f if line.strip()}
+    except FileNotFoundError:
+        pass
+
+    updated = existing | suspicious_ips
+
+    with open(BLOCKLIST_FILE, "w") as f:
+        for ip in sorted(updated):
+            f.write(ip + "\\n")
+
     for ip in suspicious_ips:
-        print(f"Blocking IP: {ip}")
-        subprocess.run(["sudo", "ufw", "deny", "from", ip])
+        print(f"Blocked in app-level blocklist: {ip}")
 else:
-    print("\nNo IPs to block.")
+    print("\\nNo IPs to block.")
