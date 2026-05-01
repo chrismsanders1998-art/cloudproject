@@ -66,7 +66,7 @@ if suspicious_ips:
 
     with open(BLOCKLIST_FILE, "w") as f:
         for ip in sorted(updated):
-            f.write(ip + "\\n")
+            f.write(ip + "\n")
 
     for ip in suspicious_ips:
         print(f"Blocked in app-level blocklist: {ip}")
